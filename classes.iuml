@@ -1,0 +1,100 @@
+@startuml
+enum Role {
+  CLIENT
+  MAINTENANCE
+  CASHIER
+  CLEANING
+  MANAGER
+}
+
+class User {
+  - id: UUID
+  - username: String
+  - password: String
+  + login()
+  + createAccount()
+}
+
+class Maintenance {
+  - tasksList
+  + performTask()
+  + manageStockItens()
+}
+
+class Cashier {
+  + processTransaction()
+}
+
+class Cleaning {
+  - tasksList
+  + performTask()
+}
+
+class Manager {
+  + editReservation()
+  + assignTasks()
+}
+
+class Customer {
+  - customerID: int
+  - reservations: List<Reservation>
+  - createAccount()
+}
+
+class Room {
+  - roomNumber: String
+  - availability: boolean
+  - amenities: List<String>
+  - photos: List<String>
+}
+
+class Reservation {
+  - reservationID: int
+  - checkInDate: Date
+  - checkOutDate: Date
+  - numRooms: int
+  - additionalServices: List<String>
+  - totalCost: double
+  + calculateTotalCost()
+}
+
+class Transaction {
+  - transactionID: int
+  - type: String
+  - amount: double
+}
+
+class StockItem {
+  - itemID: int
+  - itemName: String
+  - quantity: int
+  - minStockLevel: int
+  + reorderItem()
+}
+
+class Task{
+  - type: TaskType
+  - user_id: UUID
+}
+
+enum TaskType{
+    MAINTENANCE
+    CLEANING
+}
+
+User -- Role: Has >
+User <|-- Maintenance
+User <|-- Cashier
+User <|-- Cleaning
+User <|-- Manager
+User <|-- Customer
+Cashier "1" -- "0..*" Transaction: Procces >
+Cleaning "1" -- "0..*" Task: Perform >
+Maintenance "1" -- "0..*" Task: Perform >
+Manager "1" -- "0..*" Task: Assign >
+Customer "1" -- "0..*" Reservation: Generates >
+Reservation "1" -- "1..*" Transaction: Generates >
+Reservation "1" -- "1..*" Room: Has >
+Task -- TaskType: Has >
+Maintenance -- StockItem: Manage >
+@enduml
