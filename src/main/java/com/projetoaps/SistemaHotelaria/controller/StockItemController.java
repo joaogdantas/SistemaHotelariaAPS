@@ -1,7 +1,6 @@
 package com.projetoaps.SistemaHotelaria.controller;
 
 import com.projetoaps.SistemaHotelaria.domain.StockItem.*;
-import com.projetoaps.SistemaHotelaria.domain.user.UsersReturnData;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ public class StockItemController {
     private StockItemRepository itemRepository;
 
     @PostMapping("/create")
-    public ResponseEntity registerItem(@RequestBody @Valid RegisterItemDTO data, UriComponentsBuilder uriComponentsBuilder){
+    public ResponseEntity registerItem(@RequestBody @Valid RegisterItemDTO data){
         StockItem newItem = new StockItem();
 
         newItem.setName(data.name());
@@ -35,9 +34,7 @@ public class StockItemController {
 
         StockItem savedItem = itemRepository.save(newItem);
 
-        var uri = uriComponentsBuilder.path("/item/{id}").buildAndExpand(this.item.getId()).toUri();
-
-        return ResponseEntity.created(uri).body("Item criado com sucesso!");
+        return ResponseEntity.status(HttpStatus.CREATED.value()).body("Item criado com sucesso!");
     }
 
     @GetMapping("/all")
@@ -57,9 +54,28 @@ public class StockItemController {
             StockItem findedItem = existentItem.get();
             findedItem.setQuantity(data.quantity());
 
+            findedItem.reorderItem();
+
             itemRepository.save(findedItem);
 
-            item.reorderItem();
+            return ResponseEntity.status(HttpStatus.OK).body("Estoque do item atualizado com sucesso!");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Esse item não existe, insira um existente, por favor.");
+    }
+
+    @PutMapping("order/{id}/{quantity}")
+    @Transactional
+    public ResponseEntity makeOrder(@PathVariable UUID id, @PathVariable int quantity){
+        Optional<StockItem> existentItem = itemRepository.findById(id);
+
+        if (existentItem.isPresent()) {
+            StockItem findedItem = existentItem.get();
+
+            findedItem.setQuantity(findedItem.getQuantity() - quantity);
+
+            findedItem.reorderItem();
+
+            itemRepository.save(findedItem);
 
             return ResponseEntity.status(HttpStatus.OK).body("Estoque do item atualizado com sucesso!");
         }

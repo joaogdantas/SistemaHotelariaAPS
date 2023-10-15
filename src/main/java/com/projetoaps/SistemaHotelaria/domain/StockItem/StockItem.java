@@ -28,7 +28,7 @@ public class StockItem {
 
     public void reorderItem(){
         if(quantity < minStockLevel){
-            quantity =+ 10;
+            quantity += 10;
         }
     }
 }
