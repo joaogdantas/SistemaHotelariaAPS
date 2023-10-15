@@ -1,11 +1,5 @@
 package com.projetoaps.SistemaHotelaria.controller;
 
-import com.projetoaps.SistemaHotelaria.domain.Employee.Employee;
-import com.projetoaps.SistemaHotelaria.domain.Employee.EmployeeRepository;
-import com.projetoaps.SistemaHotelaria.domain.StockItem.ManagerUpdateStockItemDTO;
-import com.projetoaps.SistemaHotelaria.domain.StockItem.RegisterItemDTO;
-import com.projetoaps.SistemaHotelaria.domain.StockItem.ReturnItensDTO;
-import com.projetoaps.SistemaHotelaria.domain.StockItem.StockItem;
 import com.projetoaps.SistemaHotelaria.domain.Task.*;
 import com.projetoaps.SistemaHotelaria.domain.user.User;
 import com.projetoaps.SistemaHotelaria.domain.user.UserRepository;
@@ -13,7 +7,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,51 +20,43 @@ import java.util.UUID;
 @RequestMapping("/task")
 public class TaskController {
     private Task task;
-    private Employee employee;
     private User user;
-    @Autowired
-    private EmployeeRepository employeeRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private TaskRepository taskRepository;
 
     @PostMapping("/create")
-    public ResponseEntity registerTask(@RequestBody @Valid CreateTaskDTO data, UriComponentsBuilder uriComponentsBuilder){
-        Task newTask = new Task();
+    public ResponseEntity assignTask(@RequestBody CreateTaskDTO data){
+        Task task = new Task();
+
+        task.setDescription(data.description());
+        task.setType(data.type());
+        task.setDone(false);
 
         Optional<User> optionalUser = userRepository.findById(data.userId());
-
-        if(optionalUser.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body("Não existe um usuário registrado com esse id, insira um válido");
+        if (optionalUser.isPresent()) {
+            task.setUser(optionalUser.get());
+        } else {
+            return ResponseEntity.badRequest().body("Não existe uma conta com esse id registrado, por favor, atribua um válido");
         }
 
-        User findedUser = optionalUser.get();
+        Task savedTask = taskRepository.save(task);
 
-        newTask.setEmployee(findedUser.getEmployee());
-        newTask.setType(data.type());
-        newTask.setDescription(data.description());
-        newTask.setDone(false);
-
-        Task savedTask = taskRepository.save(newTask);
-
-        var uri = uriComponentsBuilder.path("/task/{id}").buildAndExpand(this.task.getId()).toUri();
-
-        return ResponseEntity.created(uri).body("Tarefa registrada com sucesso!");
+        return ResponseEntity.status(HttpStatus.CREATED).body("Tarefa atribuída com sucesso");
     }
-
 
     @GetMapping("/{userId}/all")
     public ResponseEntity<List<ReturnEmployeesTaskListDTO>> findAllTasksOfEmployee(@PathVariable UUID userId) {
 
-        Optional<Employee> existentEmployee = employeeRepository.findById(userId);
+        Optional<User> existentUser = userRepository.findById(userId);
 
-        if(existentEmployee.isEmpty()){
+        if(existentUser.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).build();
         }
 
-        Employee findedEmployee = existentEmployee.get();
-        List<Task> tasks = findedEmployee.getTaskList();
+        User findedUser = existentUser.get();
+        List<Task> tasks = findedUser.getTasks();
 
         List<ReturnEmployeesTaskListDTO> result = new ArrayList<>();
 

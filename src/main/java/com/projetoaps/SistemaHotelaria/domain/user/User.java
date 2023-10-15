@@ -1,5 +1,6 @@
 package com.projetoaps.SistemaHotelaria.domain.user;
 
+import com.projetoaps.SistemaHotelaria.domain.Task.Task;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity(name = "users")
 @Table(name = "users")
@@ -22,7 +24,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", unique = true, nullable = false)
-    private String id;
+    private UUID id;
 
     @Column(name = "login", unique = true, nullable = false)
     private String login;
@@ -32,6 +34,9 @@ public class User implements UserDetails {
 
     @Column(name = "role", nullable = false)
     private UserRole role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Task> tasks;
 
     public User(String login, String password, UserRole role) {
         this.login = login;

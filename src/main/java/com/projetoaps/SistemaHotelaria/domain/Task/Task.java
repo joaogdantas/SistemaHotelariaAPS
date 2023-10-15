@@ -1,8 +1,6 @@
 package com.projetoaps.SistemaHotelaria.domain.Task;
 
-import com.projetoaps.SistemaHotelaria.domain.Employee.Employee;
 import com.projetoaps.SistemaHotelaria.domain.user.User;
-import com.projetoaps.SistemaHotelaria.domain.user.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +31,6 @@ public class Task {
     private Boolean done;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id")
+    @JoinColumn(name = "user_id")
     private User user;
 }
