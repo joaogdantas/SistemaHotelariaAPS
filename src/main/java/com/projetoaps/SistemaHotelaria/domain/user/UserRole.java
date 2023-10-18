@@ -7,9 +7,10 @@ public enum UserRole {
     MAINTENANCE("maintenance"),
     CASHIER("cashier"),
     CLEANER("cleaner"),
-    MANAGER("manager");
+    MANAGER("manager"),
+    CUSTOMER("customer");
 
-    private String role;
+    private final String role;
 
     UserRole(String role){
         this.role = role;

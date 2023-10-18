@@ -1,28 +1,33 @@
-package com.projetoaps.SistemaHotelaria.domain.customer;
+package com.projetoaps.SistemaHotelaria.domain.additionalservices;
 
 import com.projetoaps.SistemaHotelaria.domain.reservation.Reservation;
-import com.projetoaps.SistemaHotelaria.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.UUID;
 
-@Entity(name = "customers")
+@Entity(name = "additional_services")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Customer extends User {
+public class AdditionalServices {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, nullable = false)
-    private String customerID;
+    private UUID id;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     @Column(nullable = false)
-    private List<Reservation> reservations;
+    private String name;
+
+    @Column(nullable = false)
+    private double value;
+
+    @ManyToOne
+    @JoinColumn(name = "reservation_id", nullable = false)
+    private Reservation reservation;
 }

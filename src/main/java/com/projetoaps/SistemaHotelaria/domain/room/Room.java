@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity(name = "rooms")
 @NoArgsConstructor
@@ -17,17 +18,13 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, nullable = false)
-    private String id;
+    private UUID id;
 
     @Column(nullable = false)
     private String roomNumber;
 
     @Column(nullable = false)
-    private boolean availability;
-
-    @ElementCollection
-    @Column(nullable = false)
-    private List<String> amenities;
+    private int beds;
 
     @ElementCollection
     @Column(nullable = false)

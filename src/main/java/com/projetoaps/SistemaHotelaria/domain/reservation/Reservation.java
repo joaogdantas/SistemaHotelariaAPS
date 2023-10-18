@@ -1,8 +1,8 @@
 package com.projetoaps.SistemaHotelaria.domain.reservation;
 
-import com.projetoaps.SistemaHotelaria.domain.customer.Customer;
-import com.projetoaps.SistemaHotelaria.domain.receptionist.Receptionist;
+import com.projetoaps.SistemaHotelaria.domain.additionalservices.AdditionalServices;
 import com.projetoaps.SistemaHotelaria.domain.room.Room;
+import com.projetoaps.SistemaHotelaria.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity(name = "reservations")
 @NoArgsConstructor
@@ -22,7 +23,7 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(unique = true, nullable = false)
-    private String reservationID;
+    private UUID reservationID;
 
     @Column(nullable = false)
     private LocalDateTime checkInDate;
@@ -30,22 +31,18 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDateTime checkOutDate;
 
-    @ElementCollection
-    @Column(nullable = false)
-    private List<String> additionalServices;
-
     @Column(nullable = false)
     private double totalCost;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id", referencedColumnName = "id")
     private Room room;
 
-    @ManyToOne
-    @JoinColumn(name="customer_id", nullable=false)
-    private Customer customer;
-
-    @ManyToOne
-    @JoinColumn(name="receptionist_id", nullable=false)
-    private Receptionist receptionist;
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
+    @Column(nullable = false)
+    private List<AdditionalServices> additionalServices;
 }

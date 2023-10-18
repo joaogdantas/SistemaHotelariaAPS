@@ -1,7 +1,5 @@
 package com.projetoaps.SistemaHotelaria;
 
-import com.projetoaps.SistemaHotelaria.domain.user.User;
-import com.projetoaps.SistemaHotelaria.domain.user.UserRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
