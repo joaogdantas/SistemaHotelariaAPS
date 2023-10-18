@@ -6,7 +6,7 @@ public enum UserRole {
     CLIENT("client"),
     MAINTENANCE("maintenance"),
     CASHIER("cashier"),
-    CLEANING("cleaning"),
+    CLEANER("cleaner"),
     MANAGER("manager");
 
     private String role;
