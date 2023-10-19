@@ -8,7 +8,6 @@ public record ReservationDTO(
         LocalDateTime checkOutDate,
         double totalCost,
         String userId,
-        String roomId,
-        List<String> additionalServices
+        String roomId
 ) {
 }

@@ -1,6 +1,6 @@
 package com.projetoaps.SistemaHotelaria.domain.reservation;
 
-import com.projetoaps.SistemaHotelaria.domain.additionalservices.AdditionalServices;
+import com.projetoaps.SistemaHotelaria.domain.StockItem.StockItem;
 import com.projetoaps.SistemaHotelaria.domain.room.Room;
 import com.projetoaps.SistemaHotelaria.domain.user.User;
 import jakarta.persistence.*;
@@ -43,6 +43,9 @@ public class Reservation {
     private Room room;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
-    @Column(nullable = false)
-    private List<AdditionalServices> additionalServices;
+    private List<StockItem> stockItems;
+
+    public void setStockItems(List<StockItem> stockItems) {
+        this.stockItems = stockItems;
+    }
 }

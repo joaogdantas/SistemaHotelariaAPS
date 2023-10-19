@@ -1,6 +1,5 @@
 package com.projetoaps.SistemaHotelaria.domain.reservation;
 
-import com.projetoaps.SistemaHotelaria.domain.additionalservices.AdditionalServices;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +11,6 @@ public record ReturnReservationDTO(
         LocalDateTime checkOutDate,
         double totalCost,
         String userId,
-        String roomId,
-        List<AdditionalServices> additionalServices
+        String roomId
 ) {
 }

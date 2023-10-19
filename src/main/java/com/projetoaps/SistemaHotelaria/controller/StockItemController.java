@@ -1,6 +1,10 @@
 package com.projetoaps.SistemaHotelaria.controller;
 
 import com.projetoaps.SistemaHotelaria.domain.StockItem.*;
+import com.projetoaps.SistemaHotelaria.domain.reservation.Reservation;
+import com.projetoaps.SistemaHotelaria.domain.reservation.ReservationRepository;
+import com.projetoaps.SistemaHotelaria.domain.user.User;
+import com.projetoaps.SistemaHotelaria.domain.user.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,9 @@ public class StockItemController {
     private StockItem item;
     @Autowired
     private StockItemRepository itemRepository;
+    private Reservation reservation;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @PostMapping("/create")
     public ResponseEntity registerItem(@RequestBody @Valid RegisterItemDTO data){
@@ -45,6 +52,20 @@ public class StockItemController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/{reservationId}/all")
+    public ResponseEntity<List<StockItem>> findAllReservationItens(@PathVariable UUID reservationId) {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
+
+        if(optionalReservation.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).build();
+        }
+
+        Reservation findedReservation = optionalReservation.get();
+
+        var reservationItens = findedReservation.getStockItems();
+        return ResponseEntity.ok(reservationItens);
+    }
+
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity updateItem(@RequestBody @Valid ManagerUpdateStockItemDTO data, @PathVariable UUID id){
@@ -63,23 +84,36 @@ public class StockItemController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Esse item não existe, insira um existente, por favor.");
     }
 
-    @PutMapping("order/{id}/{quantity}")
+    @PutMapping("order/{reservationId}/{itemId}/{quantity}")
     @Transactional
-    public ResponseEntity makeOrder(@PathVariable UUID id, @PathVariable int quantity){
-        Optional<StockItem> existentItem = itemRepository.findById(id);
+    public ResponseEntity makeOrderInReservation(@PathVariable UUID reservationId, @PathVariable UUID itemId, @PathVariable int quantity) {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
 
-        if (existentItem.isPresent()) {
-            StockItem findedItem = existentItem.get();
+        if (optionalReservation.isPresent()) {
+            Optional<StockItem> existentItem = itemRepository.findById(itemId);
 
-            findedItem.setQuantity(findedItem.getQuantity() - quantity);
+            Reservation findedReservation = optionalReservation.get();
 
-            findedItem.reorderItem();
+            if (existentItem.isPresent()) {
+                StockItem findedItem = existentItem.get();
 
-            itemRepository.save(findedItem);
+                findedItem.setQuantity(findedItem.getQuantity() - quantity);
 
-            return ResponseEntity.status(HttpStatus.OK).body("Estoque do item atualizado com sucesso!");
+                itemRepository.save(findedItem);
+
+                List<StockItem> reservationItems = findedReservation.getStockItems();
+
+                reservationItems.add(findedItem);
+
+                findedReservation.setStockItems(reservationItems);
+
+                reservationRepository.save(findedReservation);
+
+                return ResponseEntity.status(HttpStatus.OK).body("Pedido realizado com sucesso!");
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Esse item não existe, insira um existente, por favor.");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Esse item não existe, insira um existente, por favor.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reserva inválida, insira um existente, por favor.");
     }
 
     @DeleteMapping("/{id}")
