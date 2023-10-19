@@ -1,5 +1,6 @@
 package com.projetoaps.SistemaHotelaria.controller;
 
+import com.projetoaps.SistemaHotelaria.domain.room.CreateRoomDTO;
 import com.projetoaps.SistemaHotelaria.domain.room.Room;
 import com.projetoaps.SistemaHotelaria.domain.room.RoomDTO;
 import com.projetoaps.SistemaHotelaria.domain.room.RoomRepository;
@@ -23,10 +24,17 @@ public class RoomController {
     private RoomRepository roomRepository;
 
     @PostMapping("/create")
-    public ResponseEntity save(@RequestBody @Valid RoomDTO roomDTO) {
+    public ResponseEntity save(@RequestBody @Valid CreateRoomDTO roomDTO) {
+
+        Optional<Room> optionalRoom = roomRepository.findByRoomNumber(roomDTO.roomNumber());
+
+        if(optionalRoom.isPresent()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body("Já existe um quarto com esse número, por favor escolha um diferente");
+        }
+
         Room room = new Room();
-        room.setRoomNumber(room.getRoomNumber());
-        room.setBeds(room.getBeds());
+        room.setRoomNumber(roomDTO.roomNumber());
+        room.setBeds(roomDTO.beds());
         room.setPhotos(roomDTO.photos());
 
         roomRepository.save(room);
@@ -44,12 +52,11 @@ public class RoomController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity updateItem(@RequestBody @Valid RoomDTO data, @PathVariable UUID id) {
+    public ResponseEntity updateItem(@RequestBody @Valid CreateRoomDTO data, @PathVariable UUID id) {
         Optional<Room> existentRoom = roomRepository.findById(id);
 
         if (existentRoom.isPresent()) {
             Room room = existentRoom.get();
-            room.setId(id);
             room.setRoomNumber(data.roomNumber());
             room.setBeds(data.beds());
             room.setPhotos(data.photos());
