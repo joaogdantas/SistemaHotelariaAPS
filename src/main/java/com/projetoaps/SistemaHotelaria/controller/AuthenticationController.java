@@ -2,18 +2,15 @@ package com.projetoaps.SistemaHotelaria.controller;
 
 import com.projetoaps.SistemaHotelaria.domain.user.*;
 import com.projetoaps.SistemaHotelaria.infra.security.TokenService;
-import com.projetoaps.SistemaHotelaria.infra.web.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import com.projetoaps.SistemaHotelaria.infra.security.*;
 
 import java.util.ArrayList;
 import java.util.List;
