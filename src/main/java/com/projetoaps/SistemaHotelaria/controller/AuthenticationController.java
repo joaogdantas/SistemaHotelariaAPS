@@ -1,19 +1,24 @@
 package com.projetoaps.SistemaHotelaria.controller;
 
-import com.projetoaps.SistemaHotelaria.domain.StockItem.ReturnItensDTO;
 import com.projetoaps.SistemaHotelaria.domain.user.*;
 import com.projetoaps.SistemaHotelaria.infra.security.TokenService;
+import com.projetoaps.SistemaHotelaria.infra.web.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import com.projetoaps.SistemaHotelaria.infra.security.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,6 +50,19 @@ public class AuthenticationController {
         this.repository.save(newUser);
 
         return ResponseEntity.ok().body("Usuário registrado com sucesso!");
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getById(@PathVariable UUID id){
+
+        Optional<User> optionalUser = repository.findById(id);
+
+        if(optionalUser.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body("Não existe um usuário com esse id");
+        }
+
+        User findedUser = optionalUser.get();
+        return ResponseEntity.ok(new ReturnUsersDTO(findedUser));
     }
 
     @GetMapping("/all")

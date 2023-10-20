@@ -1,5 +1,6 @@
 package com.projetoaps.SistemaHotelaria.domain.user;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public record ReturnUsersDTO(
@@ -7,4 +8,11 @@ public record ReturnUsersDTO(
         String login,
         UserRole role
 ) {
+    public ReturnUsersDTO(User user){
+        this(
+                user.getId(),
+                user.getLogin(),
+                user.getRole()
+        );
+    }
 }
